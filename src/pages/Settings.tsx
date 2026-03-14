@@ -54,9 +54,10 @@ export default function Settings() {
 
       if (error) throw error;
       alert('Perfil atualizado com sucesso!');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating profile:', err);
-      alert('Erro ao atualizar perfil. Verifique se a tabela "profiles" existe.');
+      const errorMsg = err?.message || 'Erro desconhecido';
+      alert(`Erro ao atualizar perfil:\n${errorMsg}\n\nVerifique se a tabela "profiles" existe no Supabase.`);
     } finally {
       setLoading(false);
     }
