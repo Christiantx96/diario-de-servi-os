@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 import { Service } from '../types';
 import { FileText, Download, Calendar as CalendarIcon, Loader2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
@@ -82,11 +83,13 @@ const ReportPDF = ({ services, date, providerName }: { services: any[], date: st
 );
 
 export default function Reports() {
-  const { user } = useAuth();
+  // Using demo user ID for testing without authentication
+  const DEMO_USER_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+  const user = { id: DEMO_USER_ID, email: 'demo@example.com' } as any;
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [providerName, setProviderName] = useState('');
+  const [providerName, setProviderName] = useState('Demo User');
 
   useEffect(() => {
     if (user) {

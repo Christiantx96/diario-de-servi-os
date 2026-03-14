@@ -96,9 +96,10 @@ export default function ServiceForm() {
       }
 
       navigate(`/services/${serviceId}`);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error saving service:', err);
-      alert('Erro ao salvar serviço. Verifique se as tabelas existem no Supabase.');
+      const errorMsg = err?.message || 'Erro desconhecido';
+      alert(`Erro ao salvar serviço:\n${errorMsg}\n\nVerifique se as tabelas existem no Supabase.`);
     } finally {
       setLoading(false);
     }
@@ -154,9 +155,10 @@ export default function ServiceForm() {
         if (dbError) throw dbError;
       }
       fetchService(); // Refresh attachments
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error uploading file:', err);
-      alert('Erro ao fazer upload. Certifique-se de que o bucket "service-attachments" existe e é público.');
+      const errorMsg = err?.message || 'Erro desconhecido';
+      alert(`Erro ao fazer upload:\n${errorMsg}\n\nCertifique-se de que:\n1. O bucket "service-attachments" foi criado no Supabase\n2. As políticas de RLS estão configuradas corretamente`);
     } finally {
       setUploading(false);
     }
