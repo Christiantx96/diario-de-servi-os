@@ -54,6 +54,7 @@ export default function Settings() {
 
       if (error) throw error;
       alert('Perfil atualizado com sucesso!');
+      // Keep profile data for display but form is already updated
     } catch (err: any) {
       console.error('Error updating profile:', err);
       const errorMsg = err?.message || 'Erro desconhecido';
@@ -125,14 +126,6 @@ export default function Settings() {
               </button>
             </div>
           </form>
-
-          <div className="card space-y-4 bg-red-50 border-red-100">
-            <h2 className="text-xl font-bold text-red-700">Zona de Perigo</h2>
-            <p className="text-sm text-red-600">Ações irreversíveis para sua conta.</p>
-            <button className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors">
-              Excluir Minha Conta
-            </button>
-          </div>
         </div>
 
         <div className="space-y-6">
