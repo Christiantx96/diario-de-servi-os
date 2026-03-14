@@ -1,86 +1,39 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext';
 import { Service } from '../types';
-import { FileText, Download, Calendar as CalendarIcon, Loader2 } from 'lucide-react';
+import { FileText, Download, Calendar as CalendarIcon, Loader2, AlertCircle } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer';
 
-// Register fonts for PDF
-Font.register({
-  family: 'Helvetica',
-  fonts: [
-    { src: 'https://cdn.jsdelivr.net/npm/@canvas-fonts/helvetica@1.0.4/Helvetica.ttf' },
-    { src: 'https://cdn.jsdelivr.net/npm/@canvas-fonts/helvetica@1.0.4/Helvetica-Bold.ttf', fontWeight: 'bold' }
-  ]
-});
+const styles = {
+  page: { padding: 40, fontSize: 10 },
+  header: { marginBottom: 20, paddingBottom: 10 },
+  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 5 },
+  subtitle: { fontSize: 12, marginBottom: 10 },
+  meta: { marginTop: 10, marginBottom: 20 }
+};
 
-const styles = StyleSheet.create({
-  page: { padding: 40, fontFamily: 'Helvetica', fontSize: 10, color: '#4B3621' },
-  header: { marginBottom: 20, borderBottom: 1, borderBottomColor: '#4B3621', paddingBottom: 10 },
-  title: { fontSize: 20, fontWeight: 'bold', color: '#2E7D32', marginBottom: 5 },
-  subtitle: { fontSize: 12, color: '#8B4513' },
-  meta: { marginTop: 10, flexDirection: 'row', justifyContent: 'space-between' },
-  sectionTitle: { fontSize: 14, fontWeight: 'bold', marginTop: 20, marginBottom: 10, backgroundColor: '#FFFFF0', padding: 5 },
-  table: { display: 'flex', width: 'auto', borderStyle: 'solid', borderWidth: 1, borderColor: '#4B3621', borderRightWidth: 0, borderBottomWidth: 0 },
-  tableRow: { margin: 'auto', flexDirection: 'row' },
-  tableColHeader: { width: '16.6%', borderStyle: 'solid', borderWidth: 1, borderColor: '#4B3621', borderLeftWidth: 0, borderTopWidth: 0, backgroundColor: '#4B3621', color: '#FFFFFF', padding: 5, fontWeight: 'bold' },
-  tableCol: { width: '16.6%', borderStyle: 'solid', borderWidth: 1, borderColor: '#4B3621', borderLeftWidth: 0, borderTopWidth: 0, padding: 5 },
-  attachmentSection: { marginTop: 30 },
-  attachmentGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  attachmentImage: { width: 150, height: 150, objectFit: 'cover', borderRadius: 5, border: 1, borderColor: '#4B3621' },
-  footer: { position: 'absolute', bottom: 30, left: 40, right: 40, textAlign: 'center', fontSize: 8, color: '#8B4513', borderTop: 1, borderTopColor: '#4B3621', paddingTop: 10 }
-});
-
-const ReportPDF = ({ services, date, providerName }: { services: any[], date: string, providerName: string }) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Relatório Diário de Serviços</Text>
-        <Text style={styles.subtitle}>Prestador: {providerName}</Text>
-        <View style={styles.meta}>
-          <Text>Data: {format(parseISO(date), 'dd/MM/yyyy')}</Text>
-          <Text>Total de Serviços: {services.length}</Text>
-        </View>
-      </View>
-
-      <View style={styles.table}>
-        <View style={styles.tableRow}>
-          <Text style={styles.tableColHeader}>Horário</Text>
-          <Text style={styles.tableColHeader}>Cliente</Text>
-          <Text style={styles.tableColHeader}>Local</Text>
-          <Text style={styles.tableColHeader}>Tipo</Text>
-          <Text style={styles.tableColHeader}>Descrição</Text>
-          <Text style={styles.tableColHeader}>Obs</Text>
-        </View>
-        {services.map((s, i) => (
-          <View key={i} style={styles.tableRow}>
-            <Text style={styles.tableCol}>{s.start_time} - {s.end_time}</Text>
-            <Text style={styles.tableCol}>{s.client_name}</Text>
-            <Text style={styles.tableCol}>{s.location}</Text>
-            <Text style={styles.tableCol}>{s.service_type}</Text>
-            <Text style={styles.tableCol}>{s.description}</Text>
-            <Text style={styles.tableCol}>{s.notes || '-'}</Text>
-          </View>
-        ))}
-      </View>
-
-      <View style={styles.attachmentSection}>
-        <Text style={styles.sectionTitle}>Anexos da Diária</Text>
-        <View style={styles.attachmentGrid}>
-          {services.flatMap(s => s.service_attachments || []).filter(a => a.file_type === 'image').map((att, i) => (
-            <Image key={i} src={att.file_url} style={styles.attachmentImage} />
-          ))}
-        </View>
-      </View>
-
-      <Text style={styles.footer}>
-        Gerado em {format(new Date(), "dd/MM/yyyy 'às' HH:mm")} - ServiceLog MVP
-      </Text>
-    </Page>
-  </Document>
-);
+// Simple CSV export function (safer than PDF)
+function generateCSV(services: any[], date: string): string {
+  const headers = ['Horário', 'Cliente', 'Local', 'Tipo', 'Descrição', 'Observações'];
+  const rows = services.map(s => [
+    `${s.start_time} - ${s.end_time}`,
+    s.client_name,
+    s.location,
+    s.service_type,
+    s.description || '',
+    s.notes || ''
+  ]);
+  
+  const csvContent = [
+    `Relatório de Serviços - ${format(parseISO(date), 'dd/MM/yyyy')}`,
+    '',
+    headers.join(','),
+    ...rows.map(r => r.map(cell => `"${cell}"`).join(','))
+  ].join('\n');
+  
+  return csvContent;
+}
 
 export default function Reports() {
   // Using demo user ID for testing without authentication
@@ -88,32 +41,66 @@ export default function Reports() {
   const user = { id: DEMO_USER_ID, email: 'demo@example.com' } as any;
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [services, setServices] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Começa true para não mostrar "buscando" logo
+  const [error, setError] = useState<string | null>(null);
   const [providerName, setProviderName] = useState('Demo User');
 
   useEffect(() => {
-    if (user) {
-      fetchServices();
-      setProviderName(user.email || 'Prestador');
+    let isMounted = true; // Previne state updates após unmount
+    
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const { data, error: dbError } = await supabase
+          .from('services')
+          .select('*, service_attachments(*)')
+          .eq('user_id', user?.id)
+          .eq('date', selectedDate)
+          .order('start_time', { ascending: true });
+
+        if (dbError) {
+          throw new Error(`Database error: ${dbError.message}`);
+        }
+        
+        if (isMounted) {
+          setServices(data || []);
+          setLoading(false);
+        }
+      } catch (err: any) {
+        if (isMounted) {
+          const errorMsg = err?.message || 'Erro ao buscar serviços';
+          console.error('Error fetching services for report:', err);
+          setError(errorMsg);
+          setServices([]);
+          setLoading(false);
+        }
+      }
     }
-  }, [selectedDate, user]);
 
-  async function fetchServices() {
-    setLoading(true);
+    load();
+    
+    return () => {
+      isMounted = false; // Cleanup
+    };
+  }, [selectedDate]);
+
+  function handleExportCSV() {
     try {
-      const { data, error } = await supabase
-        .from('services')
-        .select('*, service_attachments(*)')
-        .eq('user_id', user?.id)
-        .eq('date', selectedDate)
-        .order('start_time', { ascending: true });
-
-      if (error) throw error;
-      setServices(data || []);
+      const csvContent = generateCSV(services, selectedDate);
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `relatorio-${selectedDate}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch (err) {
-      console.error('Error fetching services for report:', err);
-    } finally {
-      setLoading(false);
+      console.error('Error exporting CSV:', err);
+      alert('Erro ao exportar relatório. Tente novamente.');
     }
   }
 
@@ -121,8 +108,15 @@ export default function Reports() {
     <div className="space-y-8">
       <header>
         <h1 className="text-3xl font-bold text-brown-primary">Relatórios</h1>
-        <p className="text-brown-primary/60">Gere relatórios PDF detalhados das suas diárias.</p>
+        <p className="text-brown-primary/60">Exporte relatórios detalhados de suas diárias em CSV.</p>
       </header>
+
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-700"><strong>Erro:</strong> {error}</p>
+          <p className="text-xs text-red-600 mt-2">Verifique se a tabela "services" existe no Supabase e se o user_id está preenchido.</p>
+        </div>
+      )}
 
       <div className="card max-w-md space-y-6">
         <div className="space-y-2">
@@ -157,18 +151,13 @@ export default function Reports() {
             Buscando dados...
           </button>
         ) : services.length > 0 ? (
-          <PDFDownloadLink
-            document={<ReportPDF services={services} date={selectedDate} providerName={providerName} />}
-            fileName={`relatorio-${selectedDate}.pdf`}
-            className="btn-primary w-full flex items-center justify-center gap-2 no-underline"
+          <button
+            onClick={() => handleExportCSV()}
+            className="btn-primary w-full flex items-center justify-center gap-2"
           >
-            {({ loading: pdfLoading }) => (
-              <>
-                {pdfLoading ? <Loader2 className="animate-spin" size={20} /> : <Download size={20} />}
-                {pdfLoading ? 'Gerando PDF...' : 'Baixar Relatório PDF'}
-              </>
-            )}
-          </PDFDownloadLink>
+            <Download size={20} />
+            Exportar Relatório (CSV)
+          </button>
         ) : (
           <div className="p-4 text-center text-sm text-brown-primary/40 border border-dashed border-brown-primary/20 rounded-lg">
             Nenhum serviço registrado nesta data para gerar relatório.

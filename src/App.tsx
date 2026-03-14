@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Pages
 import Dashboard from './pages/Dashboard';
@@ -11,13 +12,14 @@ import Settings from './pages/Settings';
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={
-          <Layout>
-            <Dashboard />
-          </Layout>
-        } />
+    <ErrorBoundary>
+      <Router>
+        <Routes>
+          <Route path="/" element={
+            <Layout>
+              <Dashboard />
+            </Layout>
+          } />
           
           <Route path="/services" element={
             <Layout>
@@ -52,5 +54,6 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>
+    </ErrorBoundary>
     );
 }
