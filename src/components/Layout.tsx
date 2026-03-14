@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, ClipboardList, FileText, Settings, PlusCircle } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -62,3 +62,4 @@ export function Layout({ children }: LayoutProps) {
     </div>
   );
 }
+

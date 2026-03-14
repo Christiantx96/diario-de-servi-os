@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 @theme {
   --color-ivory: #FFFFF0;
@@ -30,3 +30,4 @@
 .card {
   @apply bg-white p-6 rounded-xl shadow-sm border border-brown-primary/5;
 }
+

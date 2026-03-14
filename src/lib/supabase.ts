@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+﻿import { createClient } from '@supabase/supabase-js';
 
 // Use a more defensive way to access environment variables in Vite
 const getEnvVar = (key: string) => {
@@ -31,3 +31,4 @@ export const supabase = createClient(
   validUrl(supabaseUrl),
   supabaseAnonKey || 'placeholder-key'
 );
+

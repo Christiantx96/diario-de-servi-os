@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Service } from '../types';
 import { FileText, Download, Calendar as CalendarIcon, Loader2, AlertCircle } from 'lucide-react';
@@ -229,3 +229,4 @@ export default function Reports() {
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-export type ServiceStatus = 'pendente' | 'em_andamento' | 'concluido' | 'cancelado';
+﻿export type ServiceStatus = 'pendente' | 'em_andamento' | 'concluido' | 'cancelado';
 
 export interface Service {
   id: string;
@@ -29,3 +29,4 @@ export interface UserProfile {
   company_name?: string;
   avatar_url?: string;
 }
+

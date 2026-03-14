@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 interface Props {
   children: React.ReactNode;
@@ -53,3 +53,4 @@ export class ErrorBoundary extends React.Component<Props, ErrorBoundaryState> {
     return this.props.children;
   }
 }
+

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { X, Plus, Save, Trash2 } from 'lucide-react';
 
@@ -268,3 +268,4 @@ export function QuickServiceAdd({ selectedDate, onServicesAdded }: QuickServiceA
     </div>
   );
 }
+

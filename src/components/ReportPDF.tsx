@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -261,7 +261,7 @@ export const ReportPDF: React.FC<ReportPDFProps> = ({
                   {service.service_type}
                 </Text>
                 <Text style={[styles.tableCell, styles.tableCell_centered, { flex: 0.8, fontSize: 7 }]}>
-                  {service.status === 'concluido' ? '✓' : '◯'}
+                  {service.status === 'concluido' ? '✓' : '○'}
                 </Text>
               </View>
 
@@ -345,3 +345,4 @@ export const ReportPDF: React.FC<ReportPDFProps> = ({
     </Document>
   );
 };
+

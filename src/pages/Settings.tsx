@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { User, Mail, Building, Save, Camera } from 'lucide-react';
 
@@ -162,3 +162,4 @@ export default function Settings() {
     </div>
   );
 }
+
