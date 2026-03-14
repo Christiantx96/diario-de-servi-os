@@ -131,7 +131,7 @@ export default function ServiceForm() {
       for (const file of Array.from(files) as File[]) {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
-        const filePath = `${user?.id}/${id}/${fileName}`;
+        const filePath = `${id}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from('service-attachments')
