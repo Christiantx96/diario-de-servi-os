@@ -1,0 +1,12 @@
+.git
+.gitignore
+README.md
+node_modules
+npm-debug.log
+.env.local
+.env.example
+.vscode
+.DS_Store
+SUPABASE_SETUP.md
+supabase_setup.sql
+metadata.json
