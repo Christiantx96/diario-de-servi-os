@@ -1,12 +1,10 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { User, Mail, Building, Save, Camera } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Settings() {
-  // Note: Authentication has been removed from this app
-  // Using a placeholder user ID for database operations
-  const DEMO_USER_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'; // Use a valid UUID v4
-  const user = { id: DEMO_USER_ID, email: 'demo@example.com' } as any;
+  const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState({
     full_name: '',
@@ -14,16 +12,17 @@ export default function Settings() {
   });
 
   useEffect(() => {
-    // Profile loading is disabled without authentication
-    fetchProfile();
-  }, []);
+    if (user) {
+      fetchProfile(user.id);
+    }
+  }, [user]);
 
-  async function fetchProfile() {
+  async function fetchProfile(userId: string) {
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user?.id)
+        .eq('id', userId)
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
@@ -40,13 +39,14 @@ export default function Settings() {
 
   async function updateProfile(e: React.FormEvent) {
     e.preventDefault();
+    if (!user) return;
     setLoading(true);
 
     try {
       const { error } = await supabase
         .from('profiles')
         .upsert({
-          id: user?.id,
+          id: user.id,
           full_name: profile.full_name,
           company_name: profile.company_name,
           updated_at: new Date().toISOString(),
@@ -54,7 +54,6 @@ export default function Settings() {
 
       if (error) throw error;
       alert('Perfil atualizado com sucesso!');
-      // Keep profile data for display but form is already updated
     } catch (err: any) {
       console.error('Error updating profile:', err);
       const errorMsg = err?.message || 'Erro desconhecido';
@@ -63,6 +62,12 @@ export default function Settings() {
       setLoading(false);
     }
   }
+
+  if (authLoading) {
+    return <div className="p-8 text-center text-brown-primary/60">Carregando sessão...</div>;
+  }
+
+  if (!user) return null;
 
   return (
     <div className="space-y-8">
@@ -162,4 +167,3 @@ export default function Settings() {
     </div>
   );
 }
-

@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Service } from '../types';
@@ -7,21 +7,26 @@ import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '../lib/utils';
 import { QuickServiceAdd } from '../components/QuickServiceAdd';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function ServiceList() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    fetchServices();
-  }, []);
+    if (user) {
+      fetchServices(user.id);
+    }
+  }, [user]);
 
-  async function fetchServices() {
+  async function fetchServices(userId: string) {
     try {
       const { data, error } = await supabase
         .from('services')
         .select('*')
+        .eq('user_id', userId)
         .order('date', { ascending: false })
         .order('start_time', { ascending: true });
 
@@ -34,7 +39,7 @@ export default function ServiceList() {
     }
   }
 
-  const filteredServices = services.filter(s => 
+  const filteredServices = services.filter(s =>
     s.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.service_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.location.toLowerCase().includes(searchTerm.toLowerCase())
@@ -51,6 +56,12 @@ export default function ServiceList() {
 
   const sortedDates = Object.keys(groupedServices).sort((a, b) => b.localeCompare(a));
 
+  if (authLoading || loading) {
+    return <div className="p-8 text-center text-brown-primary/60">Carregando...</div>;
+  }
+
+  if (!user) return null;
+
   return (
     <div className="space-y-6">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -63,7 +74,10 @@ export default function ServiceList() {
             <Plus size={20} />
             Novo Registro
           </Link>
-          <QuickServiceAdd selectedDate={new Date().toISOString().split('T')[0]} onServicesAdded={() => fetchServices()} />
+          <QuickServiceAdd
+            selectedDate={new Date().toISOString().split('T')[0]}
+            onServicesAdded={() => fetchServices(user.id)}
+          />
         </div>
       </header>
 
@@ -87,9 +101,7 @@ export default function ServiceList() {
 
       {/* Grouped List */}
       <div className="space-y-8">
-        {loading ? (
-          <div className="p-12 text-center text-brown-primary/40">Carregando serviços...</div>
-        ) : sortedDates.length === 0 ? (
+        {sortedDates.length === 0 ? (
           <div className="card p-12 text-center text-brown-primary/40">
             Nenhum serviço encontrado.
           </div>
@@ -145,4 +157,3 @@ export default function ServiceList() {
     </div>
   );
 }
-

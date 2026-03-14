@@ -1,6 +1,7 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { X, Plus, Save, Trash2 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface QuickService {
   id: string;
@@ -20,6 +21,7 @@ interface QuickServiceAddProps {
 }
 
 export function QuickServiceAdd({ selectedDate, onServicesAdded }: QuickServiceAddProps) {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [services, setServices] = useState<QuickService[]>([]);
   const [saving, setSaving] = useState(false);
@@ -33,8 +35,6 @@ export function QuickServiceAdd({ selectedDate, onServicesAdded }: QuickServiceA
     notes: '',
     status: 'pendente',
   });
-
-  const DEMO_USER_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 
   const addService = () => {
     if (!currentService.client_name || !currentService.service_type) {
@@ -72,6 +72,11 @@ export function QuickServiceAdd({ selectedDate, onServicesAdded }: QuickServiceA
   };
 
   const saveAllServices = async () => {
+    if (!user) {
+      alert('Faça login para salvar serviços.');
+      return;
+    }
+
     if (services.length === 0) {
       alert('Adicione pelo menos um serviço');
       return;
@@ -80,7 +85,7 @@ export function QuickServiceAdd({ selectedDate, onServicesAdded }: QuickServiceA
     setSaving(true);
     try {
       const servicesToInsert = services.map(s => ({
-        user_id: DEMO_USER_ID,
+        user_id: user.id,
         date: selectedDate,
         client_name: s.client_name,
         service_type: s.service_type,
@@ -109,6 +114,8 @@ export function QuickServiceAdd({ selectedDate, onServicesAdded }: QuickServiceA
       setSaving(false);
     }
   };
+
+  if (!user) return null;
 
   if (!isOpen) {
     return (
@@ -268,4 +275,3 @@ export function QuickServiceAdd({ selectedDate, onServicesAdded }: QuickServiceA
     </div>
   );
 }
-

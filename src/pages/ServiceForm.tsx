@@ -1,12 +1,14 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Service, ServiceStatus } from '../types';
-import { ArrowLeft, Save, Trash2, Upload, X, Image as ImageIcon, FileText } from 'lucide-react';
+import { ArrowLeft, Save, Trash2, Upload, X, FileText } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function ServiceForm() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const isEditing = !!id;
 
   const [loading, setLoading] = useState(false);
@@ -27,17 +29,18 @@ export default function ServiceForm() {
   });
 
   useEffect(() => {
-    if (isEditing) {
-      fetchService();
+    if (isEditing && user) {
+      fetchService(user.id);
     }
-  }, [id]);
+  }, [id, user]);
 
-  async function fetchService() {
+  async function fetchService(userId: string) {
     try {
       const { data, error } = await supabase
         .from('services')
         .select('*, service_attachments(*)')
         .eq('id', id)
+        .eq('user_id', userId)
         .single();
 
       if (error) throw error;
@@ -70,13 +73,13 @@ export default function ServiceForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
 
     setLoading(true);
     try {
-      const DEMO_USER_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
       const payload = {
         ...formData,
-        user_id: DEMO_USER_ID, // Adiciona user_id ao serviço
+        user_id: user.id,
       };
 
       let serviceId = id;
@@ -85,7 +88,8 @@ export default function ServiceForm() {
         const { error } = await supabase
           .from('services')
           .update(payload)
-          .eq('id', id);
+          .eq('id', id)
+          .eq('user_id', user.id);
         if (error) throw error;
       } else {
         const { data, error } = await supabase
@@ -108,6 +112,7 @@ export default function ServiceForm() {
   };
 
   const handleDelete = async () => {
+    if (!user) return;
     if (!window.confirm('Tem certeza que deseja excluir este registro?')) return;
 
     setLoading(true);
@@ -115,7 +120,8 @@ export default function ServiceForm() {
       const { error } = await supabase
         .from('services')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id);
       if (error) throw error;
       navigate('/services');
     } catch (err) {
@@ -127,7 +133,7 @@ export default function ServiceForm() {
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || files.length === 0 || !id) return;
+    if (!files || files.length === 0 || !id || !user) return;
 
     setUploading(true);
     try {
@@ -151,12 +157,12 @@ export default function ServiceForm() {
           .insert([{
             service_id: id,
             file_url: publicUrl,
-            file_type: file.type.startsWith('image/') ? 'image' : 'document'
+            file_type: file.type.startsWith('image/') ? 'image' : 'document',
           }]);
 
         if (dbError) throw dbError;
       }
-      fetchService(); // Refresh attachments
+      fetchService(user.id); // Refresh attachments
     } catch (err: any) {
       console.error('Error uploading file:', err);
       const errorMsg = err?.message || 'Erro desconhecido';
@@ -168,7 +174,6 @@ export default function ServiceForm() {
 
   const removeAttachment = async (attachmentId: string, fileUrl: string) => {
     try {
-      // Extract path from URL
       const path = fileUrl.split('service-attachments/').pop();
       if (path) {
         await supabase.storage.from('service-attachments').remove([path]);
@@ -181,7 +186,9 @@ export default function ServiceForm() {
     }
   };
 
-  if (fetching) return <div className="p-12 text-center">Carregando...</div>;
+  if (authLoading || fetching) return <div className="p-12 text-center">Carregando...</div>;
+
+  if (!user) return null;
 
   return (
     <div className="space-y-6">
@@ -328,4 +335,3 @@ export default function ServiceForm() {
     </div>
   );
 }
-

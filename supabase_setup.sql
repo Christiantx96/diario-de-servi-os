@@ -65,19 +65,19 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 -- Services: Users can view/edit their own services
 CREATE POLICY "Users can view their own services"
   ON services FOR SELECT
-  USING (auth.uid() = user_id OR auth.uid() IS NULL);
+  USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can create services"
   ON services FOR INSERT
-  WITH CHECK (auth.uid() = user_id OR auth.uid() IS NULL);
+  WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can update their own services"
   ON services FOR UPDATE
-  USING (auth.uid() = user_id OR auth.uid() IS NULL);
+  USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete their own services"
   ON services FOR DELETE
-  USING (auth.uid() = user_id OR auth.uid() IS NULL);
+  USING (auth.uid() = user_id);
 
 -- Service Attachments: Users can view/manage attachments for their services
 CREATE POLICY "Users can view attachments for their services"
@@ -86,7 +86,7 @@ CREATE POLICY "Users can view attachments for their services"
     EXISTS (
       SELECT 1 FROM services 
       WHERE services.id = service_attachments.service_id 
-      AND (auth.uid() = services.user_id OR auth.uid() IS NULL)
+      AND auth.uid() = services.user_id
     )
   );
 
@@ -96,7 +96,7 @@ CREATE POLICY "Users can add attachments to their services"
     EXISTS (
       SELECT 1 FROM services 
       WHERE services.id = service_attachments.service_id 
-      AND (auth.uid() = services.user_id OR auth.uid() IS NULL)
+      AND auth.uid() = services.user_id
     )
   );
 
@@ -106,18 +106,18 @@ CREATE POLICY "Users can delete attachments from their services"
     EXISTS (
       SELECT 1 FROM services 
       WHERE services.id = service_attachments.service_id 
-      AND (auth.uid() = services.user_id OR auth.uid() IS NULL)
+      AND auth.uid() = services.user_id
     )
   );
 
 -- Profiles: Users can view/update their own profile
 CREATE POLICY "Users can view their own profile"
   ON profiles FOR SELECT
-  USING (auth.uid() = id OR auth.uid() IS NULL);
+  USING (auth.uid() = id);
 
 CREATE POLICY "Users can update their own profile"
   ON profiles FOR UPDATE
-  USING (auth.uid() = id OR auth.uid() IS NULL);
+  USING (auth.uid() = id);
 
 -- ============================================
 -- STORAGE SETUP

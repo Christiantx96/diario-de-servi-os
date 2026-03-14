@@ -1,7 +1,8 @@
-﻿import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { LogIn } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -9,6 +10,13 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate('/');
+    }
+  }, [authLoading, user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +54,10 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  if (authLoading) {
+    return <div className="p-8 text-center text-brown-primary/60">Carregando sessão...</div>;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-ivory p-4">
@@ -115,4 +127,3 @@ export default function Login() {
     </div>
   );
 }
-

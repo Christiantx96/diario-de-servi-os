@@ -1,26 +1,14 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Service } from '../types';
-import { FileText, Download, Calendar as CalendarIcon, Loader2, AlertCircle } from 'lucide-react';
+import { FileText, Download, Calendar as CalendarIcon, Loader2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { ReportPDF } from '../components/ReportPDF';
-
-// Não precisa mais de generateCSV - vamos usar PDF!
-
-const styles = {
-  page: { padding: 40, fontSize: 10 },
-  header: { marginBottom: 20, paddingBottom: 10 },
-  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 5 },
-  subtitle: { fontSize: 12, marginBottom: 10 },
-  meta: { marginTop: 10, marginBottom: 20 }
-};
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Reports() {
-  // Using demo user ID for testing without authentication
-  const DEMO_USER_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
-  const user = { id: DEMO_USER_ID, email: 'demo@example.com' } as any;
+  const { user, loading: authLoading } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [services, setServices] = useState<any[]>([]);
   const [selectedServices, setSelectedServices] = useState<Set<string>>(new Set());
@@ -31,12 +19,12 @@ export default function Reports() {
   useEffect(() => {
     let isMounted = true;
     
-    async function loadProfile() {
+    async function loadProfile(currentUserId: string) {
       try {
         const { data } = await supabase
           .from('profiles')
           .select('full_name')
-          .eq('id', user?.id)
+          .eq('id', currentUserId)
           .single();
         
         if (isMounted && data?.full_name) {
@@ -50,14 +38,16 @@ export default function Reports() {
       }
     }
     
-    loadProfile();
+    if (user) {
+      loadProfile(user.id);
+    }
     return () => { isMounted = false; };
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     let isMounted = true;
     
-    async function load() {
+    async function load(currentUserId: string) {
       setLoading(true);
       setError(null);
       setSelectedServices(new Set());
@@ -65,7 +55,7 @@ export default function Reports() {
         const { data, error: dbError } = await supabase
           .from('services')
           .select('*, service_attachments(*)')
-          .eq('user_id', user?.id)
+          .eq('user_id', currentUserId)
           .eq('date', selectedDate)
           .order('start_time', { ascending: true });
 
@@ -75,7 +65,6 @@ export default function Reports() {
         
         if (isMounted) {
           setServices(data || []);
-          // Auto-select all services when loading
           if (data && data.length > 0) {
             setSelectedServices(new Set(data.map(s => s.id)));
           }
@@ -92,38 +81,22 @@ export default function Reports() {
       }
     }
 
-    load();
+    if (user) {
+      load(user.id);
+    }
     
     return () => {
       isMounted = false;
     };
-  }, [selectedDate]);
-
-  const toggleServiceSelection = (serviceId: string) => {
-    const newSelected = new Set(selectedServices);
-    if (newSelected.has(serviceId)) {
-      newSelected.delete(serviceId);
-    } else {
-      newSelected.add(serviceId);
-    }
-    setSelectedServices(newSelected);
-  };
-
-  const toggleAllServices = () => {
-    if (selectedServices.size === services.length) {
-      setSelectedServices(new Set());
-    } else {
-      setSelectedServices(new Set(services.map(s => s.id)));
-    }
-  };
+  }, [selectedDate, user]);
 
   const selectedServicesList = services.filter(s => selectedServices.has(s.id));
 
-  function handleExportPDF() {
-    // O PDF será exportado via PDFDownloadLink no JSX
-    // Esta função é apenas para qualquer lógica adicional
-    console.log('Exportando PDF...');
+  if (authLoading) {
+    return <div className="p-8 text-center text-brown-primary/60">Carregando sessão...</div>;
   }
+
+  if (!user) return null;
 
   return (
     <div className="space-y-8">
@@ -175,9 +148,9 @@ export default function Reports() {
           <PDFDownloadLink
             document={
               <ReportPDF
-                services={services}
+                services={selectedServicesList}
                 date={selectedDate}
-                providerName={providerName}
+                providerName={providerName || user.email || 'Prestador de Serviços'}
                 companyName="ServiceLog"
               />
             }
@@ -229,4 +202,3 @@ export default function Reports() {
     </div>
   );
 }
-

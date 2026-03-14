@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Service } from '../types';
@@ -6,22 +6,26 @@ import { ClipboardList, Calendar, Clock, TrendingUp, Plus } from 'lucide-react';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '../lib/utils';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Dashboard() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user, loading: authLoading } = useAuth();
   const today = format(new Date(), 'yyyy-MM-dd');
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    if (user) {
+      fetchDashboardData(user.id);
+    }
+  }, [user]);
 
-  async function fetchDashboardData() {
+  async function fetchDashboardData(userId: string) {
     try {
-      // Fetch all services without user filtering
       const { data, error } = await supabase
         .from('services')
         .select('*')
+        .eq('user_id', userId)
         .order('date', { ascending: false })
         .limit(10);
 
@@ -39,6 +43,12 @@ export default function Dashboard() {
 
   const servicesToday = services.filter(s => s.date === today).length;
   const servicesThisWeek = services.filter(s => s.date >= weekStart && s.date <= weekEnd).length;
+
+  if (authLoading || loading) {
+    return <div className="p-8 text-center text-brown-primary/60">Carregando...</div>;
+  }
+
+  if (!user) return null;
 
   return (
     <div className="space-y-8">
@@ -140,4 +150,3 @@ export default function Dashboard() {
     </div>
   );
 }
-

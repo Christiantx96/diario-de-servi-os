@@ -17,7 +17,7 @@ CREATE POLICY "Users can upload files"
   ON storage.objects FOR INSERT
   WITH CHECK (
     bucket_id = 'service-attachments' 
-    AND (auth.uid()::text = (storage.foldername(name))[1] OR auth.uid() IS NULL)
+    AND auth.uid()::text = (storage.foldername(name))[1]
   );
 
 -- Permitir visualizar/download de arquivos
@@ -25,7 +25,7 @@ CREATE POLICY "Users can view their files"
   ON storage.objects FOR SELECT
   USING (
     bucket_id = 'service-attachments' 
-    AND (auth.uid()::text = (storage.foldername(name))[1] OR auth.uid() IS NULL)
+    AND auth.uid()::text = (storage.foldername(name))[1]
   );
 
 -- Permitir deletar arquivos
@@ -33,7 +33,7 @@ CREATE POLICY "Users can delete their files"
   ON storage.objects FOR DELETE
   USING (
     bucket_id = 'service-attachments' 
-    AND (auth.uid()::text = (storage.foldername(name))[1] OR auth.uid() IS NULL)
+    AND auth.uid()::text = (storage.foldername(name))[1]
   );
 
 -- Se as políticas já existem e estão gerando conflito, use DROP first:

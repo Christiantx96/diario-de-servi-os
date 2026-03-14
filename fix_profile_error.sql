@@ -29,15 +29,15 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 -- 5. CRIAR POLÍTICAS DE RLS
 CREATE POLICY "Users can view their own profile"
   ON profiles FOR SELECT
-  USING (auth.uid() = id OR true);
+  USING (auth.uid() = id);
 
 CREATE POLICY "Users can update their own profile"
   ON profiles FOR UPDATE
-  USING (auth.uid() = id OR true);
+  USING (auth.uid() = id);
 
 CREATE POLICY "Users can insert their own profile"
   ON profiles FOR INSERT
-  WITH CHECK (auth.uid() = id OR true);
+  WITH CHECK (auth.uid() = id);
 
 -- 6. INSERIR USUÁRIO DEMO PARA TESTES
 INSERT INTO profiles (id, full_name, company_name, created_at, updated_at) 
