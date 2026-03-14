@@ -6,10 +6,12 @@ import { ClipboardList, Calendar, Clock, TrendingUp, Plus } from 'lucide-react';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '../lib/utils';
+import { QuickServiceAdd } from '../components/QuickServiceAdd';
 
 export default function Dashboard() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const today = format(new Date(), 'yyyy-MM-dd');
 
   useEffect(() => {
     fetchDashboardData();
@@ -33,7 +35,6 @@ export default function Dashboard() {
     }
   }
 
-  const today = format(new Date(), 'yyyy-MM-dd');
   const weekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
   const weekEnd = format(endOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
 
@@ -47,10 +48,13 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold text-brown-primary">Dashboard</h1>
           <p className="text-brown-primary/60">Bem-vindo de volta! Veja o resumo dos seus serviços.</p>
         </div>
-        <Link to="/services/new" className="btn-primary flex items-center gap-2 self-start">
-          <Plus size={20} />
-          Novo Serviço
-        </Link>
+        <div className="flex flex-col md:flex-row gap-3">
+          <Link to="/services/new" className="btn-primary flex items-center gap-2 self-start">
+            <Plus size={20} />
+            Novo Serviço
+          </Link>
+          <QuickServiceAdd selectedDate={today} onServicesAdded={() => fetchDashboardData()} />
+        </div>
       </header>
 
       {/* Stats Grid */}

@@ -6,63 +6,62 @@ import { ptBR } from 'date-fns/locale';
 // Define styles that match your system design
 const styles = StyleSheet.create({
   page: {
-    padding: 40,
+    padding: 30,
     color: '#2C1810',
-    lineHeight: 1.6,
+    lineHeight: 1.5,
+    fontSize: 9,
   },
   // Header with logo area
   header: {
-    marginBottom: 30,
-    borderBottomWidth: 3,
+    marginBottom: 15,
+    borderBottomWidth: 2,
     borderBottomColor: '#8B4513',
-    paddingBottom: 15,
+    paddingBottom: 10,
   },
   companyName: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#4B3621',
-    marginBottom: 3,
+    marginBottom: 2,
   },
   reportTitle: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#2E7D32',
-    marginTop: 10,
-    marginBottom: 5,
+    marginBottom: 3,
   },
   subtitle: {
-    fontSize: 11,
+    fontSize: 9,
     color: '#6B4423',
-    marginBottom: 10,
   },
-  // Meta information
+  // Meta information - compact
   metaSection: {
-    marginBottom: 20,
+    marginBottom: 12,
     backgroundColor: '#FFFFF0',
-    padding: 12,
-    borderLeftWidth: 4,
+    padding: 8,
+    borderLeftWidth: 3,
     borderLeftColor: '#8B4513',
   },
   metaRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    marginBottom: 3,
   },
   metaLabel: {
-    fontSize: 10,
+    fontSize: 8,
     color: '#6B4423',
     fontWeight: 'bold',
     width: '40%',
   },
   metaValue: {
-    fontSize: 10,
+    fontSize: 8,
     color: '#2C1810',
     fontWeight: 'bold',
     width: '60%',
   },
-  // Table styling
+  // Table styling - compact
   tableContainer: {
-    marginVertical: 20,
+    marginVertical: 10,
   },
   tableHeader: {
     backgroundColor: '#4B3621',
@@ -71,8 +70,8 @@ const styles = StyleSheet.create({
   },
   tableHeaderCell: {
     flex: 1,
-    padding: 8,
-    fontSize: 9,
+    padding: 4,
+    fontSize: 8,
     fontWeight: 'bold',
     textAlign: 'center',
     borderRightWidth: 1,
@@ -80,86 +79,96 @@ const styles = StyleSheet.create({
   },
   tableRow: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
     borderBottomColor: '#E8D5C4',
-    minHeight: 30,
+    minHeight: 20,
   },
   tableCell: {
     flex: 1,
-    padding: 8,
-    fontSize: 9,
+    padding: 4,
+    fontSize: 7.5,
     color: '#2C1810',
     textAlign: 'left',
   },
   tableCell_centered: {
     textAlign: 'center',
   },
-  // Section title
+  // Section title - compact
   sectionTitle: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#FFFFF0',
     backgroundColor: '#8B4513',
-    padding: 8,
-    marginTop: 15,
-    marginBottom: 10,
+    padding: 5,
+    marginTop: 10,
+    marginBottom: 6,
   },
-  // Summary section
-  summarySection: {
-    marginTop: 20,
-    backgroundColor: '#F5F5F0',
-    padding: 15,
-    borderRadius: 4,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  // Service detail - compact inline
+  serviceDetail: {
     marginBottom: 8,
     paddingBottom: 8,
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
     borderBottomColor: '#E0D5C8',
   },
+  serviceTitle: {
+    fontSize: 8.5,
+    fontWeight: 'bold',
+    color: '#2E7D32',
+    marginBottom: 2,
+  },
+  serviceText: {
+    fontSize: 7.5,
+    color: '#2C1810',
+    marginBottom: 2,
+  },
+  // Attachments
+  attachmentContainer: {
+    marginTop: 6,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  attachmentImage: {
+    width: 80,
+    height: 80,
+    borderWidth: 1,
+    borderColor: '#8B4513',
+  },
+  // Summary - compact
+  summarySection: {
+    marginTop: 10,
+    backgroundColor: '#F5F5F0',
+    padding: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  summaryItem: {
+    textAlign: 'center',
+    flex: 1,
+  },
   summaryLabel: {
-    fontSize: 10,
+    fontSize: 7,
     color: '#6B4423',
     fontWeight: 'bold',
+    marginBottom: 2,
   },
   summaryValue: {
-    fontSize: 10,
+    fontSize: 8,
     color: '#2E7D32',
     fontWeight: 'bold',
   },
   // Footer
   footer: {
-    marginTop: 40,
-    paddingTop: 15,
+    marginTop: 15,
+    paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: '#8B4513',
-    fontSize: 8,
+    fontSize: 7,
     color: '#8B4513',
     textAlign: 'center',
   },
   footerText: {
-    marginBottom: 5,
-  },
-  // Notes section
-  notesSection: {
-    marginTop: 15,
-    padding: 10,
-    backgroundColor: '#FFFFF0',
-    borderLeftWidth: 3,
-    borderLeftColor: '#2E7D32',
-  },
-  notesTitle: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#2E7D32',
-    marginBottom: 8,
-  },
-  notesContent: {
-    fontSize: 9,
-    color: '#2C1810',
-    lineHeight: 1.5,
+    marginBottom: 3,
   },
 });
 
@@ -174,6 +183,12 @@ interface Service {
   end_time: string;
   notes: string;
   status: string;
+  service_attachments?: Array<{
+    id: string;
+    file_url: string;
+    file_type: string;
+    file_name?: string;
+  }>;
 }
 
 interface ReportPDFProps {
@@ -203,100 +218,113 @@ export const ReportPDF: React.FC<ReportPDFProps> = ({
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.companyName}>{companyName}</Text>
-          <Text style={styles.reportTitle}>RELATÓRIO DE SERVIÇOS PRESTADOS</Text>
-          <Text style={styles.subtitle}>Documento de Vistoria e Comprovação</Text>
+          <Text style={styles.reportTitle}>RELATÓRIO DE SERVIÇOS</Text>
+          <Text style={styles.subtitle}>Data: {format(parseISO(date), 'dd \'de\' MMMM \'de\' yyyy', { locale: ptBR })}</Text>
         </View>
 
         {/* Meta Information */}
         <View style={styles.metaSection}>
           <View style={styles.metaRow}>
-            <Text style={styles.metaLabel}>Prestador de Serviço:</Text>
+            <Text style={styles.metaLabel}>Prestador:</Text>
             <Text style={styles.metaValue}>{providerName}</Text>
           </View>
           <View style={styles.metaRow}>
-            <Text style={styles.metaLabel}>Data da Diária:</Text>
-            <Text style={styles.metaValue}>{format(parseISO(date), 'dd \'de\' MMMM \'de\' yyyy', { locale: ptBR })}</Text>
-          </View>
-          <View style={styles.metaRow}>
-            <Text style={styles.metaLabel}>Serviços Realizados:</Text>
+            <Text style={styles.metaLabel}>Serviços:</Text>
             <Text style={styles.metaValue}>{services.length}</Text>
           </View>
           <View style={styles.metaRow}>
-            <Text style={styles.metaLabel}>Total de Horas:</Text>
-            <Text style={styles.metaValue}>{totalHours.toFixed(1)} horas</Text>
+            <Text style={styles.metaLabel}>Total Horas:</Text>
+            <Text style={styles.metaValue}>{totalHours.toFixed(1)}h</Text>
           </View>
         </View>
 
-        {/* Services Table */}
-        <Text style={styles.sectionTitle}>DETALHAMENTO DOS SERVIÇOS</Text>
+        {/* Services Table - Compact */}
+        <Text style={styles.sectionTitle}>SERVIÇOS REALIZADOS</Text>
         <View style={styles.tableContainer}>
           <View style={styles.tableHeader}>
-            <Text style={styles.tableHeaderCell}>Horário</Text>
-            <Text style={styles.tableHeaderCell}>Cliente</Text>
-            <Text style={styles.tableHeaderCell}>Localização</Text>
-            <Text style={styles.tableHeaderCell}>Tipo de Serviço</Text>
-            <Text style={styles.tableHeaderCell}>Status</Text>
+            <Text style={[styles.tableHeaderCell, { flex: 0.7 }]}>Horário</Text>
+            <Text style={[styles.tableHeaderCell, { flex: 1.2 }]}>Cliente</Text>
+            <Text style={[styles.tableHeaderCell, { flex: 1 }]}>Tipo</Text>
+            <Text style={[styles.tableHeaderCell, { flex: 0.8 }]}>Status</Text>
           </View>
 
           {services.map((service, idx) => (
-            <View key={idx} style={styles.tableRow}>
-              <Text style={[styles.tableCell, styles.tableCell_centered]}>
-                {service.start_time} - {service.end_time}
-              </Text>
-              <Text style={styles.tableCell}>{service.client_name}</Text>
-              <Text style={styles.tableCell}>{service.location}</Text>
-              <Text style={styles.tableCell}>{service.service_type}</Text>
-              <Text style={[styles.tableCell, styles.tableCell_centered]}>
-                {service.status === 'concluido' ? '✓ Concluído' : '◯ ' + service.status}
-              </Text>
+            <View key={idx}>
+              <View style={styles.tableRow}>
+                <Text style={[styles.tableCell, styles.tableCell_centered, { flex: 0.7 }]}>
+                  {service.start_time}-{service.end_time}
+                </Text>
+                <Text style={[styles.tableCell, { flex: 1.2, fontSize: 7 }]}>
+                  {service.client_name}
+                </Text>
+                <Text style={[styles.tableCell, { flex: 1, fontSize: 7 }]}>
+                  {service.service_type}
+                </Text>
+                <Text style={[styles.tableCell, styles.tableCell_centered, { flex: 0.8, fontSize: 7 }]}>
+                  {service.status === 'concluido' ? '✓' : '◯'}
+                </Text>
+              </View>
+
+              {/* Service Details - Inline */}
+              <View style={{ ...styles.serviceDetail, paddingLeft: 8 }}>
+                {service.location && (
+                  <Text style={styles.serviceText}>
+                    <Text style={{ fontWeight: 'bold' }}>Local:</Text> {service.location}
+                  </Text>
+                )}
+                {service.description && (
+                  <Text style={styles.serviceText}>
+                    <Text style={{ fontWeight: 'bold' }}>Descrição:</Text> {service.description}
+                  </Text>
+                )}
+                {service.notes && (
+                  <Text style={styles.serviceText}>
+                    <Text style={{ fontWeight: 'bold' }}>Obs:</Text> {service.notes}
+                  </Text>
+                )}
+
+                {/* Show Attachments */}
+                {service.service_attachments && service.service_attachments.length > 0 && (
+                  <View style={styles.attachmentContainer}>
+                    {service.service_attachments.map((att, attIdx) => {
+                      // Check if it's an image
+                      if (att.file_type === 'image' || att.file_url?.includes('image')) {
+                        return (
+                          <View key={attIdx}>
+                            <Image
+                              src={att.file_url}
+                              style={styles.attachmentImage}
+                              onError={() => console.log('Could not load image')}
+                            />
+                            <Text style={{ fontSize: 6, textAlign: 'center', marginTop: 2 }}>
+                              {att.file_name?.split('/').pop() || 'Anexo'}
+                            </Text>
+                          </View>
+                        );
+                      }
+                      return null;
+                    })}
+                  </View>
+                )}
+              </View>
             </View>
           ))}
         </View>
 
-        {/* Detailed Description */}
-        {services.filter(s => s.description).length > 0 && (
-          <>
-            <Text style={styles.sectionTitle}>DESCRIÇÃO DOS SERVIÇOS</Text>
-            {services.map((service, idx) => (
-              <View key={idx} style={styles.notesSection}>
-                <Text style={styles.notesTitle}>
-                  {service.client_name} - {service.service_type}
-                </Text>
-                <Text style={styles.notesContent}>{service.description}</Text>
-              </View>
-            ))}
-          </>
-        )}
-
-        {/* Notes */}
-        {services.filter(s => s.notes).length > 0 && (
-          <>
-            <Text style={styles.sectionTitle}>OBSERVAÇÕES</Text>
-            {services.map((service, idx) => (
-              service.notes && (
-                <View key={idx} style={styles.notesSection}>
-                  <Text style={styles.notesTitle}>{service.client_name}</Text>
-                  <Text style={styles.notesContent}>{service.notes}</Text>
-                </View>
-              )
-            ))}
-          </>
-        )}
-
-        {/* Summary */}
+        {/* Summary - Compact */}
         <View style={styles.summarySection}>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Total de Serviços:</Text>
-            <Text style={styles.summaryValue}>{services.length} serviços</Text>
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryLabel}>Total Serviços</Text>
+            <Text style={styles.summaryValue}>{services.length}</Text>
           </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Horas Trabalhadas:</Text>
-            <Text style={styles.summaryValue}>{totalHours.toFixed(1)} horas</Text>
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryLabel}>Horas</Text>
+            <Text style={styles.summaryValue}>{totalHours.toFixed(1)}h</Text>
           </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Serviços Concluídos:</Text>
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryLabel}>Concluídos</Text>
             <Text style={styles.summaryValue}>
-              {services.filter(s => s.status === 'concluido').length} / {services.length}
+              {services.filter(s => s.status === 'concluido').length}/{services.length}
             </Text>
           </View>
         </View>
@@ -304,16 +332,13 @@ export const ReportPDF: React.FC<ReportPDFProps> = ({
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Documentoapreentado em: {format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+            Gerado em: {format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
           </Text>
           <Text style={styles.footerText}>
-            Este documento é valido para comprovação de serviços prestados.
+            ________________________
           </Text>
           <Text style={styles.footerText}>
-            ___________________________
-          </Text>
-          <Text style={styles.footerText}>
-            Assinatura do Prestador
+            Assinatura
           </Text>
         </View>
       </Page>
