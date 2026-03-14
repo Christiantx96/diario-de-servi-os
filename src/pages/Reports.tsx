@@ -4,6 +4,10 @@ import { Service } from '../types';
 import { FileText, Download, Calendar as CalendarIcon, Loader2, AlertCircle } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import { ReportPDF } from '../components/ReportPDF';
+
+// Não precisa mais de generateCSV - vamos usar PDF!
 
 const styles = {
   page: { padding: 40, fontSize: 10 },
@@ -12,28 +16,6 @@ const styles = {
   subtitle: { fontSize: 12, marginBottom: 10 },
   meta: { marginTop: 10, marginBottom: 20 }
 };
-
-// Simple CSV export function (safer than PDF)
-function generateCSV(services: any[], date: string): string {
-  const headers = ['Horário', 'Cliente', 'Local', 'Tipo', 'Descrição', 'Observações'];
-  const rows = services.map(s => [
-    `${s.start_time} - ${s.end_time}`,
-    s.client_name,
-    s.location,
-    s.service_type,
-    s.description || '',
-    s.notes || ''
-  ]);
-  
-  const csvContent = [
-    `Relatório de Serviços - ${format(parseISO(date), 'dd/MM/yyyy')}`,
-    '',
-    headers.join(','),
-    ...rows.map(r => r.map(cell => `"${cell}"`).join(','))
-  ].join('\n');
-  
-  return csvContent;
-}
 
 export default function Reports() {
   // Using demo user ID for testing without authentication
@@ -85,30 +67,17 @@ export default function Reports() {
     };
   }, [selectedDate]);
 
-  function handleExportCSV() {
-    try {
-      const csvContent = generateCSV(services, selectedDate);
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `relatorio-${selectedDate}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Error exporting CSV:', err);
-      alert('Erro ao exportar relatório. Tente novamente.');
-    }
+  function handleExportPDF() {
+    // O PDF será exportado via PDFDownloadLink no JSX
+    // Esta função é apenas para qualquer lógica adicional
+    console.log('Exportando PDF...');
   }
 
   return (
     <div className="space-y-8">
       <header>
         <h1 className="text-3xl font-bold text-brown-primary">Relatórios</h1>
-        <p className="text-brown-primary/60">Exporte relatórios detalhados de suas diárias em CSV.</p>
+        <p className="text-brown-primary/60">Gere relatórios profissionais em PDF com layout elegante para apresentar às empresas contratantes.</p>
       </header>
 
       {error && (
@@ -151,13 +120,34 @@ export default function Reports() {
             Buscando dados...
           </button>
         ) : services.length > 0 ? (
-          <button
-            onClick={() => handleExportCSV()}
-            className="btn-primary w-full flex items-center justify-center gap-2"
+          <PDFDownloadLink
+            document={
+              <ReportPDF
+                services={services}
+                date={selectedDate}
+                providerName={providerName}
+                companyName="ServiceLog"
+              />
+            }
+            fileName={`Relatorio-Servicos-${selectedDate}.pdf`}
+            className="btn-primary w-full flex items-center justify-center gap-2 no-underline"
           >
-            <Download size={20} />
-            Exportar Relatório (CSV)
-          </button>
+            {({ loading: pdfLoading }) => (
+              <>
+                {pdfLoading ? (
+                  <>
+                    <Loader2 className="animate-spin" size={20} />
+                    Gerando PDF...
+                  </>
+                ) : (
+                  <>
+                    <Download size={20} />
+                    Baixar Relatório em PDF
+                  </>
+                )}
+              </>
+            )}
+          </PDFDownloadLink>
         ) : (
           <div className="p-4 text-center text-sm text-brown-primary/40 border border-dashed border-brown-primary/20 rounded-lg">
             Nenhum serviço registrado nesta data para gerar relatório.
