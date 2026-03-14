@@ -5,7 +5,8 @@ import { User, Mail, Building, Save, Camera } from 'lucide-react';
 export default function Settings() {
   // Note: Authentication has been removed from this app
   // Using a placeholder user ID for database operations
-  const user = null;
+  const DEMO_USER_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'; // Use a valid UUID v4
+  const user = { id: DEMO_USER_ID, email: 'demo@example.com' } as any;
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState({
     full_name: '',
@@ -14,7 +15,7 @@ export default function Settings() {
 
   useEffect(() => {
     // Profile loading is disabled without authentication
-    // fetchProfile();
+    fetchProfile();
   }, []);
 
   async function fetchProfile() {
