@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ivory: #FFFFF0;
+  --color-ivory-dark: #FDFCF0;
+  --color-brown-primary: #4B3621;
+  --color-brown-secondary: #8B4513;
+  --color-green-action: #2E7D32;
+  --color-green-hover: #1B5E20;
+}
+
+@layer base {
+  body {
+    @apply bg-ivory text-brown-primary font-sans;
+  }
+}
+
+.btn-primary {
+  @apply bg-green-action text-white px-4 py-2 rounded-lg font-medium transition-colors hover:bg-green-hover disabled:opacity-50;
+}
+
+.btn-secondary {
+  @apply bg-brown-primary text-white px-4 py-2 rounded-lg font-medium transition-colors hover:bg-brown-secondary disabled:opacity-50;
+}
+
+.input-field {
+  @apply w-full px-4 py-2 border border-brown-primary/20 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-action/50;
+}
+
+.card {
+  @apply bg-white p-6 rounded-xl shadow-sm border border-brown-primary/5;
+}

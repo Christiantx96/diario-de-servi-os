@@ -1,0 +1,8 @@
+{
+  "name": "Diário de Serviços MVP",
+  "description": "Sistema para registro diário de serviços, organização por diária e geração de relatórios PDF com anexos.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
