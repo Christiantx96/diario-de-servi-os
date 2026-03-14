@@ -6,6 +6,7 @@ import { Search, Filter, Plus, ChevronRight, Calendar as CalendarIcon } from 'lu
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '../lib/utils';
+import { QuickServiceAdd } from '../components/QuickServiceAdd';
 
 export default function ServiceList() {
   const [services, setServices] = useState<Service[]>([]);
@@ -57,10 +58,13 @@ export default function ServiceList() {
           <h1 className="text-3xl font-bold text-brown-primary">Serviços</h1>
           <p className="text-brown-primary/60">Gerencie todos os seus registros diários.</p>
         </div>
-        <Link to="/services/new" className="btn-primary flex items-center gap-2 self-start">
-          <Plus size={20} />
-          Novo Registro
-        </Link>
+        <div className="flex flex-col md:flex-row gap-3">
+          <Link to="/services/new" className="btn-primary flex items-center gap-2 self-start">
+            <Plus size={20} />
+            Novo Registro
+          </Link>
+          <QuickServiceAdd selectedDate={new Date().toISOString().split('T')[0]} onServicesAdded={() => fetchServices()} />
+        </div>
       </header>
 
       {/* Search and Filter */}

@@ -23,16 +23,44 @@ export default function Reports() {
   const user = { id: DEMO_USER_ID, email: 'demo@example.com' } as any;
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [services, setServices] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true); // Começa true para não mostrar "buscando" logo
+  const [selectedServices, setSelectedServices] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [providerName, setProviderName] = useState('Demo User');
+  const [providerName, setProviderName] = useState('');
 
   useEffect(() => {
-    let isMounted = true; // Previne state updates após unmount
+    let isMounted = true;
+    
+    async function loadProfile() {
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user?.id)
+          .single();
+        
+        if (isMounted && data?.full_name) {
+          setProviderName(data.full_name);
+        } else if (isMounted) {
+          setProviderName('Prestador de Serviços');
+        }
+      } catch (err) {
+        console.error('Error fetching profile:', err);
+        if (isMounted) setProviderName('Prestador de Serviços');
+      }
+    }
+    
+    loadProfile();
+    return () => { isMounted = false; };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
     
     async function load() {
       setLoading(true);
       setError(null);
+      setSelectedServices(new Set());
       try {
         const { data, error: dbError } = await supabase
           .from('services')
@@ -47,6 +75,10 @@ export default function Reports() {
         
         if (isMounted) {
           setServices(data || []);
+          // Auto-select all services when loading
+          if (data && data.length > 0) {
+            setSelectedServices(new Set(data.map(s => s.id)));
+          }
           setLoading(false);
         }
       } catch (err: any) {
@@ -63,9 +95,29 @@ export default function Reports() {
     load();
     
     return () => {
-      isMounted = false; // Cleanup
+      isMounted = false;
     };
   }, [selectedDate]);
+
+  const toggleServiceSelection = (serviceId: string) => {
+    const newSelected = new Set(selectedServices);
+    if (newSelected.has(serviceId)) {
+      newSelected.delete(serviceId);
+    } else {
+      newSelected.add(serviceId);
+    }
+    setSelectedServices(newSelected);
+  };
+
+  const toggleAllServices = () => {
+    if (selectedServices.size === services.length) {
+      setSelectedServices(new Set());
+    } else {
+      setSelectedServices(new Set(services.map(s => s.id)));
+    }
+  };
+
+  const selectedServicesList = services.filter(s => selectedServices.has(s.id));
 
   function handleExportPDF() {
     // O PDF será exportado via PDFDownloadLink no JSX
