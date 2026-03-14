@@ -73,8 +73,10 @@ export default function ServiceForm() {
 
     setLoading(true);
     try {
+      const DEMO_USER_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
       const payload = {
         ...formData,
+        user_id: DEMO_USER_ID, // Adiciona user_id ao serviço
       };
 
       let serviceId = id;
