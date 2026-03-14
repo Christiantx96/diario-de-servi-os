@@ -87,7 +87,7 @@ export default function Dashboard() {
       {/* Recent Services */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-brown-primary">Últimos Registros</h2>
+          <h2 className="text-xl font-bold text-brown-primary">Ultimos Registros</h2>
           <Link to="/services" className="text-sm text-green-action font-medium hover:underline">
             Ver todos
           </Link>
